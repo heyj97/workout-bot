@@ -22,6 +22,10 @@ const commands = [
     {
         name: "debug",
         description: "디버그 명령어"
+    },
+    {
+        name: "도움말",
+        description: "명령어 목록 확인하기"
     }
 ];
 
