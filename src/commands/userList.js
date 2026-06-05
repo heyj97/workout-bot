@@ -1,14 +1,11 @@
-const { getTodayStatus } = require("../services/attendanceStatusService");
+﻿const { getUserList } = require("../services/userListService");
 
 module.exports = {
-    name: "출석현황",
+    name: "유저목록",
 
     async execute(interaction) {
-        const userId = interaction.user.id;
-        const userName = interaction.user.username;
-
         try {
-            const result = await getTodayStatus(userId, userName);
+            const result = await getUserList();
 
             return interaction.reply({
                 content: result.message,
@@ -17,8 +14,9 @@ module.exports = {
 
         } catch (error) {
             console.error(error);
+
             return interaction.reply({
-                content: "⚠️ 출석현황 조회 실패",
+                content: "⚠️ 유저 목록 조회 실패",
                 flags: 64
             });
         }

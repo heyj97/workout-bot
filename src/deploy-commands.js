@@ -15,6 +15,14 @@ const commands = [
         name: "출석현황",
         description: "오늘 출석 현황 확인하기",
     },
+    {
+        name: "유저목록",
+        description: "서버에 등록된 유저 목록 확인하기",
+    },
+    {
+        name: "debug",
+        description: "디버그 명령어"
+    }
 ];
 
 const rest = new REST({ version: "10" }).setToken(

@@ -21,10 +21,11 @@
   "homepage": "https://github.com/heyj97/workout-bot#readme",
   "dependencies": {
     "@discordjs/rest": "^2.6.1",
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^6.19.3",
     "discord-api-types": "^0.38.48",
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
-    "prisma": "^7.8.0"
+    "node-cron": "^4.2.1",
+    "prisma": "^6.19.3"
   }
 }

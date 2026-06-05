@@ -1,24 +1,111 @@
-const attendance = require("../commands/attendance");
-const ranking = require("../commands/ranking");
-const attendanceStatus = require("../commands/attendanceStatus");
+const fs = require("fs");
+const path = require("path");
 
-const commands = new Map();
+// 1. commands 자동 로딩
+const commands = {};
 
-commands.set(attendance.name, attendance);
-commands.set(ranking.name, ranking);
-commands.set(attendanceStatus.name, attendanceStatus);
+const validCommands = [];
+const invalidCommands = [];
 
+// 🔥 debug용 공유 데이터
+const commandReport = {
+    valid: [],
+    invalid: []
+};
+
+// commands 폴더 경로
+const commandsPath = path.join(__dirname, "../commands");
+
+// 파일 읽기
+const commandFiles = fs.readdirSync(commandsPath);
+
+// 로딩
+for (const file of commandFiles) {
+    if (!file.endsWith(".js")) continue;
+
+    const filePath = path.join(commandsPath, file);
+    const command = require(filePath);
+
+    // 2. validation
+    if (!command || typeof command !== "object") {
+        invalidCommands.push({ file, reason: "invalid export" });
+        commandReport.invalid.push({ file, reason: "invalid export" });
+        continue;
+    }
+
+    if (!command.name || typeof command.name !== "string") {
+        invalidCommands.push({ file, reason: "missing name" });
+        commandReport.invalid.push({ file, reason: "missing name" });
+        continue;
+    }
+
+    if (!command.execute || typeof command.execute !== "function") {
+        invalidCommands.push({ file, reason: "missing execute" });
+        commandReport.invalid.push({ file, reason: "missing execute" });
+        continue;
+    }
+
+    // 중복 체크
+    if (commands[command.name]) {
+        invalidCommands.push({ file, reason: "duplicate name" });
+        commandReport.invalid.push({ file, reason: "duplicate name" });
+        continue;
+    }
+
+    // 3. 등록
+    commands[command.name] = command;
+
+    validCommands.push(command.name);
+    commandReport.valid.push(command.name);
+}
+
+// ===== 로딩 결과 출력 =====
+console.log("\n========== COMMAND LOADING RESULT ==========");
+
+console.log(`✔ VALID COMMANDS (${validCommands.length})`);
+validCommands.forEach((name, i) => {
+    console.log(`  ${i + 1}. ${name}`);
+});
+
+console.log(`\n❌ INVALID COMMANDS (${invalidCommands.length})`);
+invalidCommands.forEach((item, i) => {
+    console.log(`  ${i + 1}. ${item.file} → ${item.reason}`);
+});
+
+console.log("===========================================\n");
+
+// 🔥 debug 연동 (핵심)
+const debugCommand = require("../commands/debug");
+debugCommand.setCommandReport(commandReport);
+
+// 4. interaction handler
 module.exports = async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    const command = commands.get(interaction.commandName);
+    const commandName = interaction.commandName;
 
-    if (!command) return;
+    console.log(`[CMD] ${commandName}`);
+
+    const command = commands[commandName];
+
+    if (!command) {
+        console.warn(`[NOT FOUND] ${commandName}`);
+        return;
+    }
 
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(`Error executing command ${interaction.commandName}:`, error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        console.error(`[ERROR] ${commandName}`, error);
+
+        if (interaction.replied || interaction.deferred) return;
+
+        await interaction.reply({
+            content: "⚠️ 명령어 실행 중 오류 발생",
+            flags: 64
+        });
     }
 };
+
+// export (debug에서도 사용 가능)
+module.exports.commandReport = commandReport;
