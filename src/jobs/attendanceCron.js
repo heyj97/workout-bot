@@ -1,5 +1,5 @@
 ﻿const cron = require("node-cron");
-const { sendAttendanceStatus } = require("../services/attendanceService");
+const { sendAttendanceStatus } = require("../services/attendanceStatusService");
 const { registerJob } = require("../system/cronManager");
 
 function startAttendanceJob(client) {

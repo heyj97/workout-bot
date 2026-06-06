@@ -37,4 +37,31 @@ async function getTodayStatus(userId, userName) {
     };
 }
 
-module.exports = { getTodayStatus };
+/**
+ * 출석 현황 메시지 (cron용)
+ */
+async function sendAttendanceStatus(client) {
+    const channel = client.channels.cache.get(process.env.CHANNEL_ID);
+    if (!channel) return;
+
+    const today = getKstDate();
+
+    const users = await prisma.userinfo.findMany();
+
+    const attendance = await prisma.attendance.findMany({
+        where: { attendance_date: today }
+    });
+
+    const attendedSet = new Set(attendance.map(a => a.user_id));
+
+    let message = "🏋️ 오늘 출석 현황\n\n";
+
+    users.forEach(user => {
+        const status = attendedSet.has(user.user_id) ? "✅" : "❌";
+        message += `${user.user_name} ${status}\n`;
+    });
+
+    return channel.send(message);
+}
+
+module.exports = { getTodayStatus, sendAttendanceStatus };
