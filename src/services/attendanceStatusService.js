@@ -1,10 +1,11 @@
 ﻿const prisma = require("../database/prisma");
 
 function getKstDate() {
-    const now = new Date();
-    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-    kst.setHours(0, 0, 0, 0);
-    return new Date(kst.getTime() - 9 * 60 * 60 * 1000);
+    return new Date(
+        new Intl.DateTimeFormat("sv-SE", {
+            timeZone: "Asia/Seoul"
+        }).format(new Date())
+    );
 }
 
 async function getTodayStatus(userId, userName) {
@@ -24,7 +25,11 @@ async function getTodayStatus(userId, userName) {
         };
     }
 
-    const formattedTime = new Date(record.attended_at).toLocaleString("ko-KR");
+    const formattedTime = new Date(record.attended_at).toLocaleString("ko-KR", {
+        timeZone: "Asia/Seoul",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 
     return {
         attended: true,
