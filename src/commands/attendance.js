@@ -5,7 +5,7 @@ module.exports = {
 
     async execute(interaction) {
         const userId = interaction.user.id;
-        const userName = interaction.user.username;
+        const userName = interaction.user.displayName;
 
         try {
             const result = await checkAttendance(userId, userName);

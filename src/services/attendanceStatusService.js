@@ -57,7 +57,7 @@ async function sendAttendanceStatus(client) {
     let message = "🏋️ 오늘 출석 현황\n\n";
 
     users.forEach(user => {
-        const status = attendedSet.has(user.user_id) ? "✅" : "❌";
+        const status = attendedSet.has(user.name) ? "✅" : "❌";
         message += `${user.user_name} ${status}\n`;
     });
 
