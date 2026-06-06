@@ -1,10 +1,11 @@
 const prisma = require("../database/prisma");
 
 function getKstDate() {
-    const now = new Date();
-    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-    kst.setHours(0, 0, 0, 0);
-    return new Date(kst.getTime() - 9 * 60 * 60 * 1000);
+    return new Date(
+        new Intl.DateTimeFormat("sv-SE", {
+            timeZone: "Asia/Seoul"
+        }).format(new Date())
+    );
 }
 
 /**
