@@ -39,8 +39,9 @@ async function checkAttendanceRanking() {
         }
     });
 
+    // 출석이 아무런  기록도 없을 시 에러처리
     if (ranking.length === 0) {
-        return "📋 이번 달 출석 기록이 없습니다.";
+        return { message: "📋 이번 달 출석 기록이 아무도 없습니다." };
     }
 
     // 유저 정보 조회
@@ -69,7 +70,7 @@ async function checkAttendanceRanking() {
         message += `${medal} ${index + 1}위 ${userMap.get(user.user_id) || user.user_id} - ${user._count.user_id}회\n`;
     });
 
-    return message;
+    return { message };
 }
 
 module.exports = {

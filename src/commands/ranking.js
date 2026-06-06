@@ -1,28 +1,26 @@
-// module.exports = {
-//     name: "랭킹",
-//
-//     async execute(interaction) {
-//         await interaction.reply("🏆 랭킹");
-//     }
-// };
-
-const { checkAttendance } = require("../services/attendanceService");
+const { checkAttendanceRanking } = require("../services/rankingService");
 
 module.exports = {
-    name: "출석",
+    name: "랭킹",
 
     async execute(interaction) {
-        const userId = interaction.user.id;
-        const userName = interaction.user.displayName;
-
         try {
-            const result = await checkAttendance(userId, userName);
+            const result = await checkAttendanceRanking();
 
-            return interaction.reply({content: result.message, flags: 64});
+            await interaction.reply({
+                content: result.message,
+                flags: 64
+            });
 
         } catch (error) {
-            console.error(error);
-            return interaction.reply("⚠️ 출석 처리 중 오류 발생");
+            console.error("[RANKING ERROR]", error);
+
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({
+                    content: "⚠️ 랭킹 조회 실패",
+                    flags: 64
+                });
+            }
         }
     }
 };
