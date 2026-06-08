@@ -1,18 +1,13 @@
-﻿const prisma = require("../database/prisma");
-
-// 외부에서 주입되는 상태
-let commandReport = {
+﻿let commandReport = {
     valid: [],
     invalid: []
 };
 
-// setter
 function setCommandReport(report) {
     commandReport = report;
 }
 
 async function execute(interaction) {
-    // 관리자 체크
     if (!interaction.memberPermissions?.has("Administrator")) {
         return interaction.reply({
             content: "❌ 관리자만 사용할 수 있습니다.",
@@ -20,23 +15,39 @@ async function execute(interaction) {
         });
     }
 
-    // DB 체크
-    let dbStatus = "❌ 실패";
+    const BASE_URL =
+        process.env.NODE_ENV === "production"
+            ? process.env.PRODUCTION_URL
+            : process.env.DEVELOP_URL;
+
+    // -----------------------------
+    // 1. Backend health check
+    // -----------------------------
+    let backendStatus = "❌ 실패";
 
     try {
-        await prisma.$queryRaw`SELECT 1`;
-        dbStatus = "✅ 정상";
+        const res = await fetch(`${BASE_URL}/users`);
+
+        if (res.ok) {
+            const { isSuccess } = await res.json();
+            backendStatus = isSuccess ? "✅ 정상" : "❌ 비정상";
+        }
     } catch {
-        dbStatus = "❌ 실패";
+        backendStatus = "❌ 실패";
     }
 
-    // ping
+    // -----------------------------
+    // 2. Bot latency
+    // -----------------------------
     const latency = interaction.client.ws.ping;
 
+    // -----------------------------
+    // 3. message build
+    // -----------------------------
     let message = "🛠 **BOT DEBUG INFO**\n\n";
 
-    message += `📡 DB 상태: ${dbStatus}\n`;
-    message += `📶 Ping: ${latency}ms\n\n`;
+    message += `🤖 Bot Ping: ${latency}ms\n`;
+    message += `🌐 Backend: ${backendStatus}\n\n`;
 
     message += `📦 Commands Loaded: ${commandReport.valid.length}\n`;
     message += `❌ Invalid Commands: ${commandReport.invalid.length}\n\n`;

@@ -1,9 +1,76 @@
 ﻿const cron = require("node-cron");
-const { sendAttendanceStatus } = require("../services/attendanceStatusService");
 const { registerJob } = require("../system/cronManager");
 
+async function attendanceStatus() {
+    const BASE_URL =
+        process.env.NODE_ENV === "production"
+            ? process.env.PRODUCTION_URL
+            : process.env.DEVELOP_URL;
+
+    try {
+        // 1. 전체 유저 조회
+        const userRes = await fetch(`${BASE_URL}/users`);
+
+        if (!userRes.ok) {
+            throw new Error(`users fetch failed: ${userRes.status}`);
+        }
+
+        const userJson = await userRes.json();
+
+        if (!userJson.isSuccess) {
+            throw new Error(userJson.message);
+        }
+
+        const users = userJson.data;
+
+        // 2. 유저별 출석 체크
+        const results = await Promise.all(
+            users.map(async (user) => {
+                try {
+                    const checkRes = await fetch(
+                        `${BASE_URL}/attendance/check/${user.user_discord_id}`
+                    );
+
+                    // 404 = 결석
+                    if (checkRes.status === 404) {
+                        return `${user.user_name} 결석`;
+                    }
+
+                    if (!checkRes.ok) {
+                        return `${user.user_name} ❌ 오류`;
+                    }
+
+                    const checkJson = await checkRes.json();
+
+                    if (checkJson.isSuccess) {
+                        return `${user.user_name} 출석`;
+                    }
+
+                    return `${user.user_name} 결석`;
+
+                } catch (err) {
+                    console.error(err);
+                    return `${user.user_name} ❌ 오류`;
+                }
+            })
+        );
+
+        // 3. 출력 로그
+        const message = results
+            .map((text, index) => `${index + 1}. ${text}`)
+            .join("\n");
+
+        console.log("📢 출석 현황 체크");
+        console.log(message);
+
+        // TODO: 필요하면 디스코드 채널 알림 추가 가능
+
+    } catch (err) {
+        console.error("❌ attendanceStatus 실패", err);
+    }
+}
+
 function startAttendanceJob(client) {
-    // 기존 시간별
     const hourlySchedules = [15, 18, 21, 23];
 
     hourlySchedules.forEach(hour => {
@@ -12,7 +79,7 @@ function startAttendanceJob(client) {
             async () => {
                 try {
                     console.log(`⏰ 출석 cron 실행: ${hour}:00`);
-                    await sendAttendanceStatus(client);
+                    await attendanceStatus();
                 } catch (err) {
                     console.error(`❌ cron 실패 (${hour}:00)`, err);
                 }
