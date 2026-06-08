@@ -11,7 +11,7 @@ module.exports = {
                     : process.env.DEVELOP_URL;
 
             const response = await fetch(
-                `${BASE_URL}/check/${userDiscordId}`
+                `${BASE_URL}/attendance/check/${userDiscordId}`
             );
 
             // 1. HTTP 에러 처리 (404 포함)

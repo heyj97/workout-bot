@@ -6,6 +6,14 @@ const commands = [
     {
         name: "출석",
         description: "오늘 출석하기",
+        options: [
+            {
+                name: "image",
+                description: "출석 인증용 이미지",
+                type: 11,
+                required: true
+            }
+        ]
     },
     {
         name: "랭킹",
