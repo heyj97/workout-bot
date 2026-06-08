@@ -84,7 +84,6 @@ module.exports = {
             return interaction.reply({
                 content:
                     `✅ 출석 완료!\n`,
-                flags: 64
             });
 
         } catch (error) {
