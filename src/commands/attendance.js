@@ -82,8 +82,15 @@ module.exports = {
             // 4. 성공 응답
             // --------------------------------------------------
             return interaction.reply({
-                content:
-                    `✅ 출석 완료!\n`,
+                content: "✅ 출석 완료!",
+                embeds: [
+                    {
+                        image: {
+                            url: image.url
+                        },
+                        color: 0x00ff00
+                    }
+                ]
             });
 
         } catch (error) {
