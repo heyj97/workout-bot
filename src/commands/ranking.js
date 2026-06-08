@@ -25,6 +25,13 @@ module.exports = {
                 });
             }
             
+            if (data.length === 0) {
+                return interaction.reply({
+                    content: "랭킹 데이터가 없습니다.",
+                    flags: 64
+                });
+            }
+            
             const userId = interaction.user.id;
             
             const description = data.map((user, index) => {
@@ -35,7 +42,7 @@ module.exports = {
                         ? `${medal} ${user.user_name} : ${user.point}pt`
                         : `${rank}. ${user.user_name} : ${user.point}pt`;
 
-                    return user.user_discord_id == userId
+                    return user.user_discord_id === userId
                         ? `➡️ **${line}**`
                         : line;
                 })
