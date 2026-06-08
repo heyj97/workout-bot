@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
+const API_HEADERS = require("../constants/APIHeader");
 
 module.exports = {
     name: "랭킹",
@@ -10,7 +11,7 @@ module.exports = {
                     ? process.env.PRODUCTION_URL
                     : process.env.DEVELOP_URL;
 
-            const response = await fetch(`${BASE_URL}/rank/point`);
+            const response = await fetch(`${BASE_URL}/rank/point`, { headers: API_HEADERS });
 
             if (!response.ok) {
                 throw new Error(`API 요청 실패: ${response.status}`);

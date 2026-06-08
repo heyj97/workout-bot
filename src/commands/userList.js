@@ -1,4 +1,5 @@
-﻿module.exports = {
+﻿const API_HEADERS = require("../constants/APIHeader");
+module.exports = {
     name: "유저목록",
     
     async execute(interaction) {
@@ -7,7 +8,7 @@
             : process.env.DEVELOP_URL;
         
         try {
-            const response = await fetch(`${BASE_URL}/users`);
+            const response = await fetch(`${BASE_URL}/users`, { headers: API_HEADERS });
             if (!response.ok) {
                 throw new Error(`API 요청 실패: ${response.status}`);
             }

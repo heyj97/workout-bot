@@ -1,4 +1,5 @@
-﻿let commandReport = {
+﻿const API_HEADERS = require("../constants/APIHeader");
+let commandReport = {
     valid: [],
     invalid: []
 };
@@ -26,7 +27,7 @@ async function execute(interaction) {
     let backendStatus = "❌ 실패";
 
     try {
-        const res = await fetch(`${BASE_URL}/users`);
+        const res = await fetch(`${BASE_URL}/users`, { headers: API_HEADERS });
 
         if (res.ok) {
             const { isSuccess } = await res.json();

@@ -1,3 +1,5 @@
+const API_HEADERS = require("../constants/APIHeader");
+
 module.exports = {
     name: "출석현황",
 
@@ -11,7 +13,8 @@ module.exports = {
                     : process.env.DEVELOP_URL;
 
             const response = await fetch(
-                `${BASE_URL}/attendance/check/${userDiscordId}`
+                `${BASE_URL}/attendance/check/${userDiscordId}`,
+                { headers: API_HEADERS }
             );
 
             // 1. HTTP 에러 처리 (404 포함)

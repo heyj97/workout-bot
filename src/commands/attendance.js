@@ -1,3 +1,4 @@
+const API_HEADERS = require("../constants/APIHeader");
 module.exports = {
     name: "출석",
 
@@ -36,9 +37,7 @@ module.exports = {
             // --------------------------------------------------
             const checkRes = await fetch(`${BASE_URL}/users`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: API_HEADERS,
                 body: JSON.stringify({
                     user_discord_id: userDiscordId,
                     user_name: userName,
@@ -63,9 +62,7 @@ module.exports = {
             // --------------------------------------------------
             const attendanceRes = await fetch(`${BASE_URL}/attendance`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: API_HEADERS,
                 body: JSON.stringify({
                     user_discord_id: userDiscordId,
                     image_url: image.url
