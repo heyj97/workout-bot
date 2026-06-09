@@ -1,5 +1,6 @@
 ﻿const cron = require("node-cron");
 const { registerJob } = require("../system/cronManager");
+const API_HEADERS = require("../constants/APIHeader");
 
 async function attendanceStatus() {
     const BASE_URL =
@@ -9,7 +10,9 @@ async function attendanceStatus() {
 
     try {
         // 1. 전체 유저 조회
-        const userRes = await fetch(`${BASE_URL}/users`);
+        const userRes = await fetch(`${BASE_URL}/users`, {
+            headers: API_HEADERS
+        });
 
         if (!userRes.ok) {
             throw new Error(`users fetch failed: ${userRes.status}`);
@@ -28,7 +31,10 @@ async function attendanceStatus() {
             users.map(async (user) => {
                 try {
                     const checkRes = await fetch(
-                        `${BASE_URL}/attendance/check/${user.user_discord_id}`
+                        `${BASE_URL}/attendance/check/${user.user_discord_id}`,
+                        {
+                            headers: API_HEADERS
+                        }
                     );
 
                     // 404 = 결석
