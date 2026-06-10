@@ -2,8 +2,6 @@
 .env
 node_modules/
 
-/src/generated/prisma
-
 # logs
 logs
 *.log
@@ -14,7 +12,3 @@ logs
 # IDE
 .vscode
 .idea
-
-# Prisma
-/src/generated/
-/prisma/migrations/dev.db

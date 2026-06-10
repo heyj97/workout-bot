@@ -2,7 +2,7 @@
 const { registerJob } = require("../system/cronManager");
 const API_HEADERS = require("../constants/APIHeader");
 
-async function attendanceStatus() {
+async function attendanceStatus(client) {
     const BASE_URL =
         process.env.NODE_ENV === "production"
             ? process.env.PRODUCTION_URL
@@ -61,15 +61,33 @@ async function attendanceStatus() {
             })
         );
 
-        // 3. 출력 로그
+        // 3. 메시지 생성
         const message = results
             .map((text, index) => `${index + 1}. ${text}`)
             .join("\n");
 
-        console.log("📢 출석 현황 체크");
-        console.log(message);
+        const finalMessage = [
+            "📢 출석 현황 체크",
+            "",
+            message
+        ].join("\n");
 
-        // TODO: 필요하면 디스코드 채널 알림 추가 가능
+        console.log(finalMessage);
+
+        // 4. 디스코드 채널 전송
+        const channelId = process.env.ATTENDANCE_CHANNEL_ID;
+
+        if (!channelId) {
+            throw new Error("ATTENDANCE_CHANNEL_ID가 설정되지 않았습니다.");
+        }
+
+        const channel = await client.channels.fetch(channelId);
+
+        if (!channel) {
+            throw new Error("출석 알림 채널을 찾을 수 없습니다.");
+        }
+
+        await channel.send(finalMessage);
 
     } catch (err) {
         console.error("❌ attendanceStatus 실패", err);
@@ -85,7 +103,7 @@ function startAttendanceJob(client) {
             async () => {
                 try {
                     console.log(`⏰ 출석 cron 실행: ${hour}:00`);
-                    await attendanceStatus();
+                    await attendanceStatus(client);
                 } catch (err) {
                     console.error(`❌ cron 실패 (${hour}:00)`, err);
                 }
