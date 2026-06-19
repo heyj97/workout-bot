@@ -98,12 +98,21 @@ module.exports = async (interaction) => {
     } catch (error) {
         console.error(`[ERROR] ${commandName}`, error);
 
-        if (interaction.replied || interaction.deferred) return;
-
-        await interaction.reply({
-            content: "⚠️ 명령어 실행 중 오류 발생",
-            flags: 64
-        });
+        try {
+            if (interaction.replied || interaction.deferred) {
+                await interaction.editReply({
+                    content: "⚠️ 명령어 실행 중 오류 발생",
+                    embeds: []
+                });
+            } else {
+                await interaction.reply({
+                    content: "⚠️ 명령어 실행 중 오류 발생",
+                    flags: 64
+                });
+            }
+        } catch (replyError) {
+            console.error(`[ERROR RESPONSE FAILED] ${commandName}`, replyError);
+        }
     }
 };
 

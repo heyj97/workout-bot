@@ -5,6 +5,8 @@ module.exports = {
     name: "pt",
 
     async execute(interaction) {
+        await interaction.deferReply();
+
         try {
             const userDiscordId = interaction.user.id;
 
@@ -29,7 +31,7 @@ module.exports = {
             }
 
             const data = await response.json();
-            const exercises = data.exercises;
+            const exercises = data.data.exercises;
 
             if (!Array.isArray(exercises)) {
                 throw new Error("exercises 데이터가 배열이 아닙니다.");
@@ -50,15 +52,14 @@ module.exports = {
                 )
                 .setTimestamp();
 
-            return interaction.reply({
+            return interaction.editReply({
                 embeds: [embed],
             });
         } catch (error) {
             console.error(error);
 
-            return interaction.reply({
+            return interaction.editReply({
                 content: "⚠️ PT 스케줄 요청 처리 중 오류 발생",
-                flags: 64,
             });
         }
     },
