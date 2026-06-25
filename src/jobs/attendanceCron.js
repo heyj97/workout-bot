@@ -95,7 +95,7 @@ async function attendanceStatus(client) {
 }
 
 function startAttendanceJob(client) {
-    const hourlySchedules = [15, 18, 21, 23];
+    const hourlySchedules = [18, 23];
 
     hourlySchedules.forEach(hour => {
         const job = cron.schedule(
